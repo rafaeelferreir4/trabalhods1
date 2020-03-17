@@ -1,5 +1,5 @@
 <?php
-$conexao = mysqli_connect("localhost","root","","rafael") or print (mysqli_error());
+$conexao = mysqli_connect("localhost","root","root","rafael") or print (mysqli_error());
 
 $query = "SELECT * FROM medicamento WHERE nome LIKE '%".$_GET['pesquisa']."%'";
 
@@ -26,7 +26,7 @@ $resultado = mysqli_query($conexao,$query);
                 name="pesquisa">
             <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
         </form>
-        <button type="button" class="btn btn-info" data-toggle="modal" data-target="#exampleModal">
+        <button type="button" class="btn btn-info" data-toggle="modal" data-target="#cadastra">
             Cadastrar
         </button>
     </nav>
@@ -47,19 +47,80 @@ $resultado = mysqli_query($conexao,$query);
             <tbody>
 
                 <?php
-            while($linha = mysqli_fetch_array($resultado)){ ?>
+                $num = 1;
+            while($linha = mysqli_fetch_array($resultado)){ 
+                ?>
                 <tr>
-                    <td><?php $linha['cod']?></td>
-                    <td><?php $linha['nome']?></td>
-                    <td><?php $linha['fabricante']?></td>
-                    <td><?php $linha['quantidade']?></td>
-                    <td><?php $linha['preco']?></td>
-                    <td><?php $linha['controlado']?></td>
-                    <td><button class="btn btn-warning">Alterar</button></td>
-                    <td><a href="exclui.php?cod=<?php $linha["cod"] ?>" class="btn btn-danger">Excluir</a></td>
+                    <td><?php echo $linha['cod']; ?></td>
+                    <td><?php echo $linha['nome']; ?></td>
+                    <td><?php echo $linha['fabricante']; ?></td>
+                    <td><?php echo $linha['quantidade']; ?></td>
+                    <td><?php echo $linha['preco']; ?></td>
+                    <td><?php echo $linha['controlado']; ?></td>
+                    <td><button type="button" class="btn btn-warning" data-toggle="modal" data-target="#<?php echo $linha['nome']?>">
+                Alterar
+                </button></td>
+                    <td><a href="exclui.php?cod=<?php echo $linha["cod"] ?>" class="btn btn-danger">Excluir</a></td>
+            
                 </tr>
+                
 
-                <!-- TODO // INCLUIR O MODAL AQUIII -->
+                <!-- Modal -->
+                <div class="modal fade" id="<?php echo $linha['nome']?>" tabindex="-1" role="dialog" aria-labelledby="<?php echo $linha['nome']?>Label" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="<?php echo $linha['nome']?>Label">Modal title</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <form action="altera.php">
+                        <div class="modal-body">
+                        <div class="form-group" style="display:none">
+                            <label>Código</label>
+                            <input name="cod" class="form-control" value=<?php echo $linha['cod']?>>
+                        </div>
+                        <div class="form-group">
+                            <label>Nome do Medicamento</label>
+                            <input name="nome" class="form-control" value=<?php echo $linha['nome']?>>
+                        </div>
+                        <div class="form-group">
+                            <label>Nome do fabricante</label>
+                            <input name="fabricante" class="form-control" value=<?php echo $linha['fabricante']?>>
+                        </div>
+                        <div class="form-group">
+                            <label>Quantidade</label>
+                            <input name="quantidade" class="form-control" type="number" value=<?php echo $linha['quantidade']?>>
+                        </div>
+                        <div class="form-group">
+                            <label>Preço</label>
+                            <input name="preco" class="form-control" type="number" step="any" value=<?php echo $linha['preco']?>>
+                        </div>
+                        <div class="form-group">
+                            <label>Controlado:</label>
+                            <select class="form-control" name="controlado" value=<?php echo $linha['controlado']?>>
+                                <?php 
+                                    if ($linha['controlado'] == "Sim") {
+                                        echo "<option>Sim</option><option>Não</option>";
+                                    } else {
+                                        echo "<option>Não</option><option>Sim</option>";
+                                    }
+                                ?>
+                            </select>
+                        </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+                            <button type="submit" class="btn btn-success">Alterar</button>
+                        </div>
+                    </form>
+                    </div>
+                </div>
+                </div>
+            
+            
+                
 
                 <?php }
 
@@ -71,12 +132,12 @@ $resultado = mysqli_query($conexao,$query);
 
 
     <!-- Modal -->
-    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+    <div class="modal fade" id="cadastra" tabindex="-1" role="dialog" aria-labelledby="cadastraLabel"
         aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Cadastrar medicamento</h5>
+                    <h5 class="modal-title" id="cadastraLabel">Cadastrar medicamento</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -97,7 +158,7 @@ $resultado = mysqli_query($conexao,$query);
                         </div>
                         <div class="form-group">
                             <label>Preço</label>
-                            <input name="preco" class="form-control" type="number">
+                            <input name="preco" class="form-control" step="any" type="number">
                         </div>
                         <div class="form-group">
                             <label>Controlado:</label>
